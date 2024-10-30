@@ -46,7 +46,7 @@ const ReportedCard = () => {
       setTotalPages(Math.ceil(response.reports.length / itemsPerPage));
       setCurrentPage(1);
     } catch (err) {
-      console.error("Error fetching reports:", err);
+      // console.error("Error fetching reports:", err);?
       setError(
         err.message || "Failed to fetch reports. Please try again later."
       );
@@ -58,7 +58,8 @@ const ReportedCard = () => {
   const paginateReports = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    setDisplayedReports(allReports.slice(startIndex, endIndex));
+    setDisplayedReports(allReports.slice(startIndex, endIndex)); 
+    console.table(allReports)
   };
 
   const handlePageChange = (page) => {

@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const baseURL = import.meta.env.VITE_BASE_URL;
 
-if (!API_URL) {
+if (!baseURL) {
   console.error("API_URL is not defined in the environment variables");
 }
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
