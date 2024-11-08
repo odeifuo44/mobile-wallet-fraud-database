@@ -6,7 +6,7 @@ import PublishFraudReportModal from './PublishFraudReportModal';
 const ReportedNumberDetailsModal = ({ isOpen, onClose, report }) => {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
-  if (!isOpen) return null; // Only render if isOpen is true
+  if (!isOpen) return null; // this will render  only if isOpen is true
 
   const handlePublishClick = () => {
     setIsPublishModalOpen(true); // Open the Publish modal

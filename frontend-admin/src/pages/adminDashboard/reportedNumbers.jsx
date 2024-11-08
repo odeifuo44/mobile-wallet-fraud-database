@@ -4,7 +4,7 @@ import ReportedNumberDetailsModal from './ReportedNumberDetailsModal';
 import RemoveAlertModal from './RemoveAlertModal';  
 import PublishFraudReportModal from './PublishFraudReportModal';  
 import DeleteNumberModal from './DeleteNumberModal';  
-import RemovedReportModal from './RemovedReportModal'; // Import RemovedReportModal
+import RemovedReportModal from './RemovedReportModal'; 
 
 const ReportedNumbersContent = () => {
   const data = [

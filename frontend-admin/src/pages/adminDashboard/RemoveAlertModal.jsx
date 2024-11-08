@@ -2,7 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 
 const RemoveAlertModal = ({ isOpen, report, onClose }) => {
-  // If the modal isn't open, return null (don't render anything)
+
   if (!isOpen) return null;
 
   // If there's no report, you can show a fallback message

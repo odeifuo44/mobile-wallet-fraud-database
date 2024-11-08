@@ -8,7 +8,7 @@ const PublishFraudReportModal = ({ report, isOpen, onClose }) => {
   // Safeguard to ensure report exists and has an avatar
   const avatarSrc = report?.avatar || grayAvatar;
 
-  // Check if report exists before rendering modal content
+  
   if (!report) {
     return <div>No report data available</div>; // Optional fallback UI if report is missing
   }
@@ -39,7 +39,7 @@ const PublishFraudReportModal = ({ report, isOpen, onClose }) => {
         {/* Display the date reported */}
         <p className="text-sm text-gray-600">Date reported: {report.date || 'No Date Available'}</p>
 
-        {/* Evidence Attachments Section */}
+        
         {report.attachments && report.attachments.length > 0 && (
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Evidence</h3>

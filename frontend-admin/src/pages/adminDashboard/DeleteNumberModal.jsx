@@ -34,7 +34,7 @@ const DeleteNumberModal = ({ isOpen, onClose, report, onDelete }) => {
         </div>
 
         <div className="comments mt-4">
-          {/* You can add more comments or info related to the report */}
+          <p>Report Comment</p>
         </div>
 
         {/* Action Buttons */}
