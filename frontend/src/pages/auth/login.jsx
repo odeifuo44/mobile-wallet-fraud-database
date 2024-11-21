@@ -8,6 +8,7 @@ import TextInput from "../../components/textInput";
 import Button from "../../components/button";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../hooks/useAuth";
+import { GoogleLogin } from '@react-oauth/google';
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -34,6 +35,44 @@ function Login() {
     } catch (error) {
       console.error("Login error:", error);
       setApiError(error.message || "An error occurred during login");
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setApiError(null);
+      
+      // Use the correct backend URL
+      const baseUrl = import.meta.env.DEV 
+        ? import.meta.env.VITE_API_URL_LOCAL
+        : import.meta.env.VITE_API_URL_PROD;
+
+      const response = await fetch(`${baseUrl}/api/auth/google/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          credential: credentialResponse.credential
+        })
+      });
+
+      const data = await response.json();
+      console.log('Backend response:', data); // Debug log
+
+      if (response.ok) {
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          window.location.reload();
+        } else {
+          throw new Error('No token received from server');
+        }
+      } else {
+        throw new Error(data.message || 'Failed to authenticate with Google');
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      setApiError(error.message || "An error occurred during Google login");
     }
   };
 
@@ -83,13 +122,34 @@ function Login() {
                 Login
               </Button>
             </div>
-            <p className="pt-2">
-              Don't have an account?{" "}
-              <a href="/signup" className="text-blue-600">
-                Sign up
-              </a>
-            </p>
           </form>
+          
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                console.error("Google Login Failed");
+                setApiError("Google login failed. Please try again.");
+              }}
+              useOneTap={false}
+            />
+          </div>
+          
+          <p className="pt-4 text-center">
+            Don't have an account?{" "}
+            <a href="/signup" className="text-blue-600">
+              Sign up
+            </a>
+          </p>
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ import TextInput from "../../components/textInput";
 import Button from "../../components/button";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../hooks/useAuth";
+import { GoogleLogin } from '@react-oauth/google';
 
 const schema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
@@ -47,17 +48,65 @@ function Signup() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setApiError(null);
+      
+      console.log('Google credential received:', credentialResponse);
+
+      const baseUrl = import.meta.env.DEV 
+        ? import.meta.env.VITE_API_URL_LOCAL
+        : import.meta.env.VITE_API_URL_PROD;
+
+      console.log('Calling backend URL:', `${baseUrl}/api/auth/google`);
+
+      const response = await fetch(`${baseUrl}/api/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          credential: credentialResponse.credential,
+          clientId: credentialResponse.clientId
+        })
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
+      
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed. Please try again.');
+        } else {
+          throw new Error(data.message || `Server error (${response.status})`);
+        }
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        window.location.reload();
+      } else {
+        throw new Error('No token received from server');
+      }
+    } catch (error) {
+      console.error("Full error details:", error);
+      setApiError(error.message || "An error occurred during Google signup");
+    }
+  };
+
   return (
     <div>
       <Navbar title="Mobile Wallet Fraud Database" />
-      <div className="min-h-screen flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center m-10">
         <div className="w-full max-w-md p-8 bg-white border-2 border-gray-400 rounded-lg ">
           <h2 className="text-2xl font-bold mb-4">Sign up</h2>
           {apiError && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
               <span className="block sm:inline">{apiError}</span>
             </div>
           )}
@@ -104,13 +153,37 @@ function Signup() {
                 Sign up
               </Button>
             </div>
-            <p className="">
-              Already have an account?{" "}
-              <a href="/login" className="text-blue-600">
-                Login
-              </a>
-            </p>
           </form>
+          
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center mb-4">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                console.error("Google Signup Failed");
+                setApiError("Failed to signup with Google. Please try again.");
+              }}
+              useOneTap={false}
+              text="signup_with"
+              shape="rectangular"
+              // theme="filled_blue"
+            />
+          </div>
+          
+          <p className="text-center">
+            Already have an account?{" "}
+            <a href="/login" className="text-blue-600">
+              Login
+            </a>
+          </p>
         </div>
       </div>
     </div>

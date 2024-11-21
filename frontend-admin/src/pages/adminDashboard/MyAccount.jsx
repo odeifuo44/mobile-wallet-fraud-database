@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '../../components/navbar';
 import { useState } from 'react'
@@ -6,6 +5,7 @@ import { DatabaseIcon, HomeIcon, ClipboardListIcon, ChevronDown, CalendarIcon } 
 import { UserGroupIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';  
+import { changeAdminPassword } from '../../services/adminService';
 
 // Importing the content components for the different tabs
 import UsersContent from '../adminDashboard/usersContent';
@@ -16,11 +16,49 @@ import RequestsContent from '../adminDashboard/requestContents';
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState('Overview');
     const [timeFilter, setTimeFilter] = useState('All time');
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: ''
+    });
+    const [passwordStatus, setPasswordStatus] = useState({ type: '', message: '' });
+    const [isLoading, setIsLoading] = useState(false);
   
     // Function to handle tab click and update the active tab state
     const handleTabClick = (tabName) => {
       setActiveTab(tabName);
     };
+
+    // Add password change handler
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        
+        try {
+            await changeAdminPassword(
+                passwordData.currentPassword,
+                passwordData.newPassword
+            );
+            
+            setPasswordStatus({
+                type: 'success',
+                message: 'Password successfully updated'
+            });
+            
+            // Clear form
+            setPasswordData({
+                currentPassword: '',
+                newPassword: ''
+            });
+        } catch (error) {
+            setPasswordStatus({
+                type: 'error',
+                message: error.message || 'Failed to update password'
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
   return (
   <div>
     <Navbar />
@@ -121,13 +159,50 @@ const MyAccount = () => {
 
         {/* Password Update Section */}
         <div>
-          <label className="block font-medium">Old password</label>
-          <input type="password" className="border rounded p-2 w-full mb-4" />
+          {passwordStatus.message && (
+            <div className={`p-4 mb-4 rounded ${
+              passwordStatus.type === 'success' 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-red-100 text-red-700'
+            }`}>
+              {passwordStatus.message}
+            </div>
+          )}
 
-          <label className="block font-medium">New password</label>
-          <input type="password" className="border rounded p-2 w-full mb-4" />
+          <form onSubmit={handlePasswordChange}>
+            <label className="block font-medium">Old password</label>
+            <input
+              type="password"
+              value={passwordData.currentPassword}
+              onChange={(e) => setPasswordData({
+                ...passwordData,
+                currentPassword: e.target.value
+              })}
+              className="border rounded p-2 w-full mb-4"
+              required
+            />
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded mt-2">Change password</button>
+            <label className="block font-medium">New password</label>
+            <input
+              type="password"
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData({
+                ...passwordData,
+                newPassword: e.target.value
+              })}
+              className="border rounded p-2 w-full mb-4"
+              required
+            />
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`bg-blue-600 text-white px-4 py-2 rounded mt-2 w-full
+                ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+            >
+              {isLoading ? 'Updating...' : 'Change password'}
+            </button>
+          </form>
         </div>
       </div>
     </div>

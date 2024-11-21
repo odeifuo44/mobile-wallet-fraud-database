@@ -20,8 +20,8 @@ function App() {
       <Routes>
 
        
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
+        {/* <Route path="/admin-login" element={<AdminLogin />} /> */}
+        <Route path="/" element={<AdminLogin />} />
         <Route path="/admin-reset-password" element={<AdminResetPassword />} />
         <Route path="/admin-recover-password" element={<AdminRecoverPassword />} />
         <Route path="/reported" element={<AdminNav />} />
